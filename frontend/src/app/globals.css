@@ -1,0 +1,207 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@keyframes gradient-x {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@layer base {
+  :root {
+    --color-primary-50: #f5f3ff;
+    --color-primary-100: #ede9fe;
+    --color-primary-200: #ddd6fe;
+    --color-primary-300: #c4b5fd;
+    --color-primary-400: #a78bfa;
+    --color-primary-500: #8b5cf6;
+    --color-primary-600: #7c3aed;
+    --color-primary-700: #6d28d9;
+    --color-primary-800: #5b21b6;
+    --color-primary-900: #4c1d95;
+
+    --bg: 255 255 255;
+    --fg: 15 23 42;
+    --muted: 248 250 252;
+    --muted-fg: 100 116 139;
+    --border: 226 232 240;
+    --ring: 99 102 241;
+  }
+
+  .dark {
+    --bg: 2 6 23;
+    --fg: 241 245 249;
+    --muted: 15 23 42;
+    --muted-fg: 148 163 184;
+    --border: 51 65 85;
+    --ring: 99 102 241;
+  }
+
+  html,
+  body,
+  #__next {
+    height: 100%;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: rgb(var(--bg));
+    color: rgb(var(--fg));
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-primary-200);
+    color: rgb(15 23 42);
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-primary-500);
+  }
+}
+
+@layer utilities {
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      max-width: 640px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      max-width: 768px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      max-width: 1024px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container {
+      max-width: 1280px;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .container {
+      max-width: 1536px;
+    }
+  }
+
+  .glass {
+    background-color: rgb(255 255 255 / 0.7);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgb(226 232 240);
+  }
+
+  .dark .glass {
+    background-color: rgb(2 6 23 / 0.6);
+    border-color: rgb(51 65 85);
+  }
+
+  .gradient-brand {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-primary-600),
+      var(--color-primary-400)
+    );
+  }
+
+  @supports (text-wrap: balance) {
+    .text-balance {
+      text-wrap: balance;
+    }
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+  }
+
+  @supports (scrollbar-width: none) {
+    .hide-scrollbar {
+      scrollbar-width: none;
+    }
+  }
+}
+
+@layer components {
+  .link-primary {
+    color: var(--color-primary-600);
+    text-decoration: none;
+  }
+
+  .link-primary:hover {
+    color: var(--color-primary-700);
+  }
+
+  .link-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-primary-500);
+  }
+
+  .btn-gradient {
+    @apply rounded-md px-4 py-2 text-white;
+    background: linear-gradient(90deg, #6366f1, #06b6d4, #10b981);
+    background-size: 200% 200%;
+    animation: gradient-x 6s ease infinite;
+    box-shadow: 0 10px 30px -15px rgba(15, 23, 42, 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *:not([data-allow-motion="true"]) {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@supports selector(::-webkit-scrollbar) {
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(100, 116, 139, 0.45);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
