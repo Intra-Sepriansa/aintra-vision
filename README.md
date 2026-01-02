@@ -66,17 +66,17 @@
 <img src="https://api.iconify.design/tabler:note.svg" width="16" height="16" alt="note" /> Ringkasan stack diambil dari `frontend/package.json` dan `backend/requirements.txt`.
 
 ### <img src="https://api.iconify.design/tabler:layout.svg" width="18" height="18" alt="frontend" /> Frontend
-- <img src="https://cdn.simpleicons.org/nextdotjs/000000" width="24" height="24" alt="Next.js" /> Next.js - App Router dan dev server.
+- <img src="https://cdn.simpleicons.org/nextdotjs/FFFFFF" width="24" height="24" alt="Next.js" /> Next.js - App Router dan dev server.
 - <img src="https://cdn.simpleicons.org/react/61DAFB" width="24" height="24" alt="React" /> React - UI berbasis komponen.
 - <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" width="24" height="24" alt="Tailwind CSS" /> Tailwind CSS v4 - styling utility-first.
 - <img src="https://cdn.simpleicons.org/typescript/3178C6" width="24" height="24" alt="TypeScript" /> TypeScript - type safety di UI.
 - <img src="https://cdn.simpleicons.org/framer/0055FF" width="24" height="24" alt="Framer Motion" /> Framer Motion - animasi interaktif.
-- <img src="https://cdn.simpleicons.org/radixui/161618" width="24" height="24" alt="Radix UI" /> Radix UI - primitives komponen aksesibel.
+- <img src="https://cdn.simpleicons.org/radixui/FFFFFF" width="24" height="24" alt="Radix UI" /> Radix UI - primitives komponen aksesibel.
 - <img src="https://api.iconify.design/tabler:layers-intersect.svg" width="24" height="24" alt="Zustand" /> Zustand - state management ringan.
 - <img src="https://cdn.simpleicons.org/zod/3E67B1" width="24" height="24" alt="Zod" /> Zod - validasi schema di client.
 - <img src="https://api.iconify.design/tabler:cloud-upload.svg" width="24" height="24" alt="React Dropzone" /> React Dropzone - drag and drop upload.
-- <img src="https://cdn.simpleicons.org/tabler/2B2D42" width="24" height="24" alt="Tabler Icons" /> Tabler Icons - set ikon UI.
-- <img src="https://cdn.simpleicons.org/lucide/000000" width="24" height="24" alt="Lucide" /> Lucide React - ikon komponen.
+- <img src="https://cdn.simpleicons.org/tabler/FFFFFF" width="24" height="24" alt="Tabler Icons" /> Tabler Icons - set ikon UI.
+- <img src="https://cdn.simpleicons.org/lucide/FFFFFF" width="24" height="24" alt="Lucide" /> Lucide React - ikon komponen.
 
 ### <img src="https://api.iconify.design/tabler:server.svg" width="18" height="18" alt="backend" /> Backend
 - <img src="https://cdn.simpleicons.org/python/3776AB" width="24" height="24" alt="Python" /> Python - bahasa utama backend.
