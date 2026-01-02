@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional, Set
 
+import numpy as np
+
 from . import img_ops, storage
 from .schemas import JobStatus, JobStatusResponse
 
@@ -16,8 +18,14 @@ from .schemas import JobStatus, JobStatusResponse
 class JobRecord:
     job_id: str
     image_path: Path
+<<<<<<< HEAD
     operation: str
     params: Dict[str, Any]
+=======
+    operation: OperationEnum
+    params: Dict
+    target_image_id: Optional[str] = None
+>>>>>>> ee3fa41 (chore: update README and UI)
     status: JobStatus = "queued"
     progress: int = 0
     result_url: Optional[str] = None
@@ -33,9 +41,25 @@ class JobManager:
         self._subscribers: Dict[str, Set[asyncio.Queue[JobStatusResponse]]] = defaultdict(set)
         self._lock = asyncio.Lock()
 
+<<<<<<< HEAD
     async def submit(self, image_path: Path, operation: str, params: Dict[str, Any]) -> JobRecord:
+=======
+    async def submit(
+        self,
+        image_path: Path,
+        operation: OperationEnum,
+        params: Dict,
+        target_image_id: Optional[str] = None,
+    ) -> JobRecord:
+>>>>>>> ee3fa41 (chore: update README and UI)
         job_id = uuid.uuid4().hex
-        record = JobRecord(job_id=job_id, image_path=image_path, operation=operation, params=params)
+        record = JobRecord(
+            job_id=job_id,
+            image_path=image_path,
+            operation=operation,
+            params=params,
+            target_image_id=target_image_id,
+        )
         async with self._lock:
             self._jobs[job_id] = record
         asyncio.create_task(self._process_job(record))
@@ -72,15 +96,32 @@ class JobManager:
         try:
             await self._update(record.job_id, status="processing", progress=20)
             original = await asyncio.to_thread(img_ops.load_image, record.image_path)
-            processed = await asyncio.to_thread(img_ops.apply_operation, original, record.operation, record.params)
+            target_image: Optional[np.ndarray] = None
+            if record.operation == OperationEnum.HISTOGRAM_MATCH:
+                if not record.target_image_id:
+                    raise ValueError("Target image tidak ditemukan untuk histogram-match")
+                target = storage.get_upload(record.target_image_id)
+                target_image = await asyncio.to_thread(img_ops.load_image, target.path)
+            processed, op_metrics = await asyncio.to_thread(
+                img_ops.apply_operation_with_metrics,
+                original,
+                record.operation,
+                record.params,
+                target_image,
+            )
             result_url = await asyncio.to_thread(storage.save_result, record.job_id, processed)
             metrics = await asyncio.to_thread(img_ops.compute_metrics, original, processed)
+            merged_metrics: Dict[str, float] = {}
+            if metrics:
+                merged_metrics.update(metrics)
+            if op_metrics:
+                merged_metrics.update(op_metrics)
             await self._update(
                 record.job_id,
                 status="completed",
                 progress=100,
                 result_url=result_url,
-                metrics=metrics,
+                metrics=merged_metrics or None,
             )
         except Exception as exc:  # noqa: BLE001
             await self._update(record.job_id, status="error", progress=100, error=str(exc))
@@ -128,4 +169,9 @@ class JobManager:
         )
 
 
+<<<<<<< HEAD
 job_manager = JobManager()
+=======
+job_manager = JobManager()
+
+>>>>>>> ee3fa41 (chore: update README and UI)

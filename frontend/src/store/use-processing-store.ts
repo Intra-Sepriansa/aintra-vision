@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 
 import { create } from "zustand";
@@ -8,13 +9,31 @@ import {
   type OperationParams,
   type OperationRegistryEntry,
   type PresetDefinition,
+=======
+"use client";
+
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+import {
+  DEFAULT_OPERATION,
+  OPERATIONS,
+  getOperationDefaults,
+  type OperationDefinition,
+  type OperationId,
+  type OperationParamValues,
+>>>>>>> ee3fa41 (chore: update README and UI)
 } from "@/lib/operations";
+
+export const HISTORY_VISIBLE = 5;
+export const HISTORY_LIMIT = 20;
 
 export interface UploadAsset {
   id: string;
   name: string;
   size: number;
   type: string;
+<<<<<<< HEAD
   previewUrl: string;
   uploadedAt: number;
 }
@@ -39,6 +58,31 @@ export type JobStatus = "idle" | "queued" | "processing" | "completed" | "error"
 
 type ParamsMap = Record<string, OperationParams>;
 
+=======
+  previewUrl: string;
+  uploadedAt: number;
+}
+
+export interface ProcessingResult {
+  jobId: string;
+  url: string | null;
+  metrics?: Record<string, number>;
+  completedAt?: number;
+}
+
+export interface HistoryEntry {
+  id: string;
+  operationId: OperationId;
+  params: OperationParamValues;
+  createdAt: number;
+  imageName: string;
+  resultUrl?: string | null;
+  metrics?: Record<string, number>;
+}
+
+export type JobStatus = "idle" | "queued" | "processing" | "completed" | "error";
+
+>>>>>>> ee3fa41 (chore: update README and UI)
 interface ProcessingState {
   operations: OperationRegistryEntry[];
   registry: Record<string, OperationRegistryEntry>;
@@ -48,14 +92,22 @@ interface ProcessingState {
   params: ParamsMap;
 
   originalImage?: UploadAsset;
+<<<<<<< HEAD
   original: string | null;
   preview: string | null;
   result: string | null;
   processingResult?: ProcessingResult;
   jobId: string | null;
+=======
+  referenceImage?: UploadAsset;
+  previewImage?: string | null;
+  result?: ProcessingResult;
+  progress: number;
+>>>>>>> ee3fa41 (chore: update README and UI)
   jobStatus: JobStatus;
   progress: number;
   error?: string | null;
+<<<<<<< HEAD
   uploading: boolean;
   processing: boolean;
   history: HistoryEntry[];
@@ -212,17 +264,54 @@ const initialState: Omit<
   | "setRegistry"
   | "setOperation"
   | "updateParam"
+=======
+  history: HistoryEntry[];
+  uploading: boolean;
+  processing: boolean;
+  setOperation: (id: OperationId) => void;
+  updateParam: (
+    operationId: OperationId,
+    paramId: string,
+    value: number | boolean | string | [number, number],
+  ) => void;
+  resetParams: (operationId: OperationId) => void;
+  setUpload: (asset?: UploadAsset) => void;
+  setReference: (asset?: UploadAsset) => void;
+  setPreviewImage: (url?: string | null) => void;
+  setResult: (result?: ProcessingResult) => void;
+  setProgress: (value: number) => void;
+  setJobStatus: (status: JobStatus) => void;
+  setError: (error?: string | null) => void;
+  pushHistory: (entry: HistoryEntry) => void;
+  setUploading: (value: boolean) => void;
+  setProcessing: (value: boolean) => void;
+  resetSession: () => void;
+}
+
+const operationalDefaults = getOperationDefaults();
+
+type ProcessingStateCore = Omit<
+  ProcessingState,
+  | "setOperation"
+  | "updateParam"
+>>>>>>> ee3fa41 (chore: update README and UI)
   | "resetParams"
   | "applyPreset"
   | "setUpload"
+<<<<<<< HEAD
   | "setOriginal"
   | "setPreview"
+=======
+  | "setReference"
+  | "setPreviewImage"
+>>>>>>> ee3fa41 (chore: update README and UI)
   | "setResult"
   | "setProcessingResult"
   | "setJobId"
   | "setProgress"
   | "setJobStatus"
   | "setError"
+<<<<<<< HEAD
   | "pushHistory"
   | "setUploading"
   | "setProcessing"
@@ -239,9 +328,27 @@ const initialState: Omit<
   result: null,
   processingResult: undefined,
   jobId: null,
+=======
+  | "pushHistory"
+  | "setUploading"
+  | "setProcessing"
+  | "resetSession"
+>;
+
+const initialState: ProcessingStateCore = {
+  operations: OPERATIONS,
+  selectedOperationId: DEFAULT_OPERATION.id,
+  params: operationalDefaults,
+  originalImage: undefined,
+  referenceImage: undefined,
+  previewImage: undefined,
+  result: undefined,
+  progress: 0,
+>>>>>>> ee3fa41 (chore: update README and UI)
   jobStatus: "idle",
   progress: 0,
   error: null,
+<<<<<<< HEAD
   uploading: false,
   processing: false,
   history: [],
@@ -379,3 +486,115 @@ export const useProcessingStore = create<ProcessingState>((set, get) => ({
     });
   },
 }));
+=======
+  history: [],
+  uploading: false,
+  processing: false,
+};
+
+type PersistedState = Partial<ProcessingStateCore> & {
+  params?: Record<OperationId, OperationParamValues>;
+  selectedOperationId?: OperationId;
+  history?: HistoryEntry[];
+};
+
+export const useProcessingStore = create<ProcessingState>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
+      setOperation: (id) => set({ selectedOperationId: id }),
+      updateParam: (operationId, paramId, value) =>
+        set((state) => ({
+          params: {
+            ...state.params,
+            [operationId]: {
+              ...state.params[operationId],
+              [paramId]: value,
+            },
+          },
+        })),
+      resetParams: (operationId) =>
+        set((state) => ({
+          params: {
+            ...state.params,
+            [operationId]: { ...operationalDefaults[operationId] },
+          },
+        })),
+      setUpload: (asset) => {
+        const previous = get().originalImage;
+        if (previous?.previewUrl && previous.previewUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(previous.previewUrl);
+        }
+        set({
+          originalImage: asset,
+          previewImage: undefined,
+          result: undefined,
+          progress: 0,
+          jobStatus: asset ? "queued" : "idle",
+          error: null,
+        });
+      },
+      setReference: (asset) => {
+        const previous = get().referenceImage;
+        if (previous?.previewUrl && previous.previewUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(previous.previewUrl);
+        }
+        set({ referenceImage: asset });
+      },
+      setPreviewImage: (url) => set({ previewImage: url ?? undefined }),
+      setResult: (result) =>
+        set({
+          result,
+          jobStatus: result ? "completed" : get().jobStatus,
+        }),
+      setProgress: (value) => set({ progress: value }),
+      setJobStatus: (status) => set({ jobStatus: status }),
+      setError: (error) => set({ error }),
+      pushHistory: (entry) =>
+        set((state) => ({
+          history: [entry, ...state.history].slice(0, HISTORY_LIMIT),
+        })),
+      setUploading: (value) => set({ uploading: value }),
+      setProcessing: (value) => set({ processing: value }),
+      resetSession: () => {
+        const previous = get().originalImage;
+        if (previous?.previewUrl && previous.previewUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(previous.previewUrl);
+        }
+        const reference = get().referenceImage;
+        if (reference?.previewUrl && reference.previewUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(reference.previewUrl);
+        }
+        set({
+          ...initialState,
+          history: get().history,
+          params: get().params,
+          selectedOperationId: get().selectedOperationId,
+        });
+      },
+    }),
+    {
+      name: "aintra-processing-store",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        history: state.history,
+        params: state.params,
+        selectedOperationId: state.selectedOperationId,
+      }),
+      version: 2,
+      migrate: (persisted: unknown, _version: number) => {
+        const cast = (persisted ?? {}) as PersistedState | undefined;
+        const history = (cast?.history ?? []).slice(0, HISTORY_LIMIT);
+        return {
+          ...initialState,
+          ...(cast ?? {}),
+          history,
+          operations: OPERATIONS,
+        };
+      },
+    },
+  ),
+);
+
+
+>>>>>>> ee3fa41 (chore: update README and UI)

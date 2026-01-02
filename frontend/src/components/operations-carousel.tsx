@@ -103,7 +103,11 @@ export function OperationsCarousel() {
             Galeri Operasi
           </p>
           <h2 className="text-2xl font-semibold text-neutral-900">
+<<<<<<< HEAD
             {totalOperations} Operasi Pengolahan Siap Produksi
+=======
+            {OPERATIONS.length} Operasi Pengolahan Siap Produksi
+>>>>>>> ee3fa41 (chore: update README and UI)
           </h2>
         </div>
 

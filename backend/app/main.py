@@ -2,13 +2,21 @@
 from __future__ import annotations
 
 import asyncio
+<<<<<<< HEAD
 import base64
+=======
+import cv2
+>>>>>>> ee3fa41 (chore: update README and UI)
 import os
 import time
 from contextlib import asynccontextmanager
-from typing import List
+from typing import Dict, List, Optional
 
 from fastapi import FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
+<<<<<<< HEAD
+=======
+from fastapi.responses import FileResponse, Response
+>>>>>>> ee3fa41 (chore: update README and UI)
 from fastapi.staticfiles import StaticFiles
 
 from . import img_ops, storage
@@ -16,6 +24,7 @@ from .job_manager import job_manager
 from .schemas import (
     HealthResponse,
     JobStatusResponse,
+    OperationEnum,
     PreviewRequest,
     PreviewResponse,
     ProcessRequest,
@@ -100,6 +109,7 @@ async def preview_image(payload: PreviewRequest):
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+<<<<<<< HEAD
     try:
         params_validated = img_ops.prepare_operation_params(payload.operation, payload.params)
         canonical_op = img_ops.canonical_operation_id(payload.operation)
@@ -121,6 +131,40 @@ async def preview_image(payload: PreviewRequest):
         result_b64=preview_b64,
         metrics=metrics or None,
     )
+=======
+    target_image = None
+    if payload.operation == OperationEnum.HISTOGRAM_MATCH:
+        if not payload.target_image_id:
+            raise HTTPException(status_code=400, detail="target_image_id wajib diisi untuk histogram-match")
+        try:
+            target_stored = storage.get_upload(payload.target_image_id)
+            target_image = await asyncio.to_thread(img_ops.load_image, target_stored.path)
+        except storage.StorageError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    preview, op_metrics = await asyncio.to_thread(
+        img_ops.generate_preview,
+        original,
+        payload.operation,
+        payload.params,
+        target=target_image,
+    )
+    preview_url = await asyncio.to_thread(
+        storage.save_preview,
+        payload.image_id,
+        preview,
+        payload.operation.value if hasattr(payload.operation, "value") else str(payload.operation),
+    )
+    metrics = await asyncio.to_thread(img_ops.compute_metrics, original, preview)
+    merged_metrics: Dict[str, float] = {}
+    if metrics:
+        merged_metrics.update(metrics)
+    if op_metrics:
+        merged_metrics.update(op_metrics)
+    return PreviewResponse(preview_url=preview_url, metrics=merged_metrics or None)
+>>>>>>> ee3fa41 (chore: update README and UI)
 
 
 # ------ submit proses penuh (background melalui job_manager) ------
@@ -130,7 +174,17 @@ async def process_image(payload: ProcessRequest) -> ProcessResponse:
         stored = storage.get_upload(payload.image_id)
     except storage.StorageError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+    target_image_id: Optional[str] = None
+    if payload.operation == OperationEnum.HISTOGRAM_MATCH:
+        if not payload.target_image_id:
+            raise HTTPException(status_code=400, detail="target_image_id wajib diisi untuk histogram-match")
+        try:
+            storage.get_upload(payload.target_image_id)
+            target_image_id = payload.target_image_id
+        except storage.StorageError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
 
+<<<<<<< HEAD
     try:
         params_validated = img_ops.prepare_operation_params(payload.operation, payload.params)
         canonical_op = img_ops.canonical_operation_id(payload.operation)
@@ -138,6 +192,9 @@ async def process_image(payload: ProcessRequest) -> ProcessResponse:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     record = await job_manager.submit(stored.path, canonical_op, params_validated)
+=======
+    record = await job_manager.submit(stored.path, payload.operation, payload.params, target_image_id)
+>>>>>>> ee3fa41 (chore: update README and UI)
     # nilai ETA hanya indikatif; FE tetap gunakan polling / WS
     return ProcessResponse(job_id=record.job_id, status=record.status, eta_ms=1200)
 
@@ -160,6 +217,35 @@ async def download_result(job_id: str):
         raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
     data = await asyncio.to_thread(path.read_bytes)
     return DownloadResponse(job_id=job_id, b64=base64.b64encode(data).decode("ascii"))
+
+
+# ------ export histogram images ------
+@app.get("/api/histogram/upload/{image_id}")
+async def histogram_upload(image_id: str, mode: str = "rgb") -> Response:
+    try:
+        stored = storage.get_upload(image_id)
+        image = await asyncio.to_thread(img_ops.load_image, stored.path)
+        hist_img = await asyncio.to_thread(img_ops.render_histogram_image, image, mode)
+    except storage.StorageError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+    ok, buf = cv2.imencode(".png", hist_img)
+    if not ok:
+        raise HTTPException(status_code=500, detail="Gagal membuat histogram")
+    return Response(content=buf.tobytes(), media_type="image/png")
+
+
+@app.get("/api/histogram/result/{job_id}")
+async def histogram_result(job_id: str, mode: str = "rgb") -> Response:
+    try:
+        path = storage.get_result_path(job_id)
+        image = await asyncio.to_thread(img_ops.load_image, path)
+        hist_img = await asyncio.to_thread(img_ops.render_histogram_image, image, mode)
+    except storage.StorageError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+    ok, buf = cv2.imencode(".png", hist_img)
+    if not ok:
+        raise HTTPException(status_code=500, detail="Gagal membuat histogram")
+    return Response(content=buf.tobytes(), media_type="image/png")
 
 
 # ------ progres realtime via WebSocket ------

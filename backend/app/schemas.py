@@ -12,6 +12,7 @@ class OperationEnum(str, Enum):
     GAMMA = "gamma"
     HIST_EQ_CLAHE = "hist_eq_clahe"
     HISTOGRAM = "histogram"
+    HISTOGRAM_MATCH = "histogram-match"
     GAUSSIAN = "gaussian"
     MEDIAN = "median"
     BILATERAL = "bilateral"
@@ -22,7 +23,14 @@ class OperationEnum(str, Enum):
     MORPHOLOGY = "morphology"
     GEO = "geo"
     GEOMETRY = "geometry"
+<<<<<<< HEAD
     THRESH_GLOBAL = "thresh_global"
+=======
+    ACTIVE_CONTOUR = "active_contour"
+    FEATURES = "features"
+    HSV_THRESHOLD = "hsv-threshold"
+    KMEANS_COLOR = "kmeans-color"
+>>>>>>> ee3fa41 (chore: update README and UI)
     THRESHOLD_GLOBAL = "threshold-global"
     THRESH_ADAPT_OTSU = "thresh_adapt_otsu"
     THRESHOLD_ADAPTIVE = "threshold-adaptive"
@@ -47,6 +55,7 @@ class PreviewRequest(BaseModel):
     image_id: str
     operation: OperationEnum
     params: OperationParamMap = Field(default_factory=dict)
+    target_image_id: Optional[str] = None
 
 
 class PreviewResponse(BaseModel):
@@ -62,6 +71,7 @@ class ProcessRequest(BaseModel):
     image_id: str
     operation: OperationEnum
     params: OperationParamMap = Field(default_factory=dict)
+    target_image_id: Optional[str] = None
 
 
 class ProcessResponse(BaseModel):

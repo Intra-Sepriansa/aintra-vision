@@ -82,13 +82,24 @@ export async function uploadImage(file: File): Promise<UploadResponse> {
 
 export async function requestPreview(
   imageId: string,
+<<<<<<< HEAD
   operation: string,
   params: OperationParams,
+=======
+  operation: OperationId,
+  params: OperationParamValues,
+  targetImageId?: string,
+>>>>>>> ee3fa41 (chore: update README and UI)
 ): Promise<PreviewResponse> {
   const response = await fetch(`${getBaseUrl()}/api/preview`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ image_id: imageId, operation, params }),
+    body: JSON.stringify({
+      image_id: imageId,
+      operation,
+      params,
+      ...(targetImageId ? { target_image_id: targetImageId } : {}),
+    }),
   });
 
   return handleResponse<PreviewResponse>(response);
@@ -96,13 +107,24 @@ export async function requestPreview(
 
 export async function requestProcessing(
   imageId: string,
+<<<<<<< HEAD
   operation: string,
   params: OperationParams,
+=======
+  operation: OperationId,
+  params: OperationParamValues,
+  targetImageId?: string,
+>>>>>>> ee3fa41 (chore: update README and UI)
 ): Promise<ProcessResponse> {
   const response = await fetch(`${getBaseUrl()}/api/process`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ image_id: imageId, operation, params }),
+    body: JSON.stringify({
+      image_id: imageId,
+      operation,
+      params,
+      ...(targetImageId ? { target_image_id: targetImageId } : {}),
+    }),
   });
 
   return handleResponse<ProcessResponse>(response);
