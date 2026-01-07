@@ -213,3 +213,7 @@ npm run dev
 - <img src="https://api.iconify.design/tabler:book.svg?color=white#gh-dark-mode-only" width="16" height="16" alt="folder" /> `docs/` - laporan dan dokumentasi pendukung.
 
 
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/platane/snk/output/github-contribution-grid-snake.svg" alt="Animated footer" />
+</div>
